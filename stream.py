@@ -1,21 +1,23 @@
-import subprocess
+import time
+from youtube_api import get_subscribers
+from stream import start_stream
 
-def start_stream(stream_key):
+CHANNEL_ID = "UCr5ik3Qjslqnl6DB8XwJxDg"
+STREAM_KEY = "YOUR_STREAM_KEY"
 
-    command = [
-        "ffmpeg",
-        "-re",
-        "-f", "lavfi",
-        "-i", "color=c=purple:s=1280x720:r=30",
-        "-f", "lavfi",
-        "-i", "anullsrc",
-        "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-pix_fmt", "yuv420p",
-        "-c:a", "aac",
-        "-b:a", "128k",
-        "-f", "flv",
-        f"rtmp://x.rtmp.youtube.com/live2/{stream_key}"
-    ]
+last_subs = 0
 
-    subprocess.Popen(command)
+start_stream(STREAM_KEY)
+
+while True:
+    subs = get_subscribers(CHANNEL_ID)
+
+    if subs != last_subs:
+        print(f"Subscribers: {subs}")
+
+        if subs > last_subs:
+            print("New Subscriber!")
+
+        last_subs = subs
+
+    time.sleep(5)
