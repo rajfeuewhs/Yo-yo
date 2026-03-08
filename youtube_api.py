@@ -1,6 +1,6 @@
 import requests
 
-API_KEY = ""AIzaSyB1kbXAnaSOc_Oxu6n7DJD-jwMABDqGMtk"
+API_KEY = "AIzaSyB1kbXAnaSOc_Oxu6n7DJD-jwMABDqGMtk"
 
 def get_subscribers(channel_id):
 
