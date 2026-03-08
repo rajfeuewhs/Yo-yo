@@ -18,8 +18,11 @@ current_subs = 0
 def update_subs():
     global current_subs
     while True:
-        current_subs = get_subscribers(CHANNEL_ID)
-        print("Subscribers:", current_subs)
+        try:
+            current_subs = get_subscribers(CHANNEL_ID)
+            print("Subscribers:", current_subs)
+        except:
+            print("API error")
         time.sleep(5)
 
 
@@ -37,10 +40,14 @@ def start_stream():
         "-f","lavfi",
         "-i","anullsrc",
         "-c:v","libx264",
-        "-pix_fmt","yuv420p",
         "-preset","veryfast",
+        "-pix_fmt","yuv420p",
+        "-b:v","2500k",
+        "-maxrate","2500k",
+        "-bufsize","5000k",
         "-c:a","aac",
         "-b:a","128k",
+        "-ar","44100",
         "-f","flv",
         f"rtmp://x.rtmp.youtube.com/live2/{STREAM_KEY}"
     ]
@@ -51,16 +58,17 @@ def start_stream():
 
         frame = np.zeros((height,width,3),np.uint8)
 
-        frame[:] = (120,0,200)   # neon purple
+        # neon purple background
+        frame[:] = (120,0,200)
 
-        text1 = "LIVE SUBSCRIBER COUNT"
-        text2 = str(current_subs)
+        title = "LIVE SUBSCRIBER COUNT"
+        subs_text = str(current_subs)
 
-        cv2.putText(frame,text1,(300,200),
+        cv2.putText(frame,title,(250,200),
                     cv2.FONT_HERSHEY_SIMPLEX,1.5,(255,255,255),3)
 
-        cv2.putText(frame,text2,(500,400),
-                    cv2.FONT_HERSHEY_SIMPLEX,3,(255,255,255),5)
+        cv2.putText(frame,subs_text,(500,400),
+                    cv2.FONT_HERSHEY_SIMPLEX,3,(255,255,255),6)
 
         pipe.stdin.write(frame.tobytes())
 
