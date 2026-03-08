@@ -1,6 +1,6 @@
 import pytchat
 
-video_id = "tmAxmgNtM7c"
+video_id = "g1OKsfnXowg"
 
 chat = pytchat.create(video_id=video_id)
 
