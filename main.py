@@ -1,9 +1,9 @@
 import time
-from youtube_api import get_subscribers, update_title
+from youtube_api import get_subscribers
 from stream import start_stream
 
 CHANNEL_ID = "UCr5ik3Qjslqnl6DB8XwJxDg"
-STREAM_KEY = "77cs-jw6x-yfeu-m2ks-82d6"
+STREAM_KEY = "YOUR_STREAM_KEY"
 
 last_subs = 0
 
@@ -14,7 +14,6 @@ while True:
 
     if subs != last_subs:
         print(f"Subscribers: {subs}")
-        update_title(subs)
 
         if subs > last_subs:
             print("New Subscriber!")
