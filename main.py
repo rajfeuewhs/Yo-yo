@@ -3,7 +3,7 @@ from youtube_api import get_subscribers
 from stream import start_stream
 
 CHANNEL_ID = "UCr5ik3Qjslqnl6DB8XwJxDg"
-STREAM_KEY = "YOUR_STREAM_KEY"
+STREAM_KEY = "77cs-jw6x-yfeu-m2ks-82d6"
 
 last_subs = 0
 
