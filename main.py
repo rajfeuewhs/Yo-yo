@@ -1,78 +1,43 @@
-import cv2
-import numpy as np
 import subprocess
-import threading
 import time
 from youtube_api import get_subscribers
 
 CHANNEL_ID = "UCr5ik3Qjslqnl6DB8XwJxDg"
 STREAM_KEY = "77cs-jw6x-yfeu-m2ks-82d6"
 
-width = 1280
-height = 720
-fps = 30
-
-current_subs = 0
-
-
-def update_subs():
-    global current_subs
-    while True:
-        try:
-            current_subs = get_subscribers(CHANNEL_ID)
-            print("Subscribers:", current_subs)
-        except:
-            print("API error")
-        time.sleep(5)
-
+subs = "0"
 
 def start_stream():
 
-    command = [
-        "ffmpeg",
-        "-y",
-        "-f","rawvideo",
-        "-vcodec","rawvideo",
-        "-pix_fmt","bgr24",
-        "-s",f"{width}x{height}",
-        "-r",str(fps),
-        "-i","-",
-        "-f","lavfi",
-        "-i","anullsrc",
-        "-c:v","libx264",
-        "-preset","veryfast",
-        "-pix_fmt","yuv420p",
-        "-b:v","2500k",
-        "-maxrate","2500k",
-        "-bufsize","5000k",
-        "-c:a","aac",
-        "-b:a","128k",
-        "-ar","44100",
-        "-f","flv",
-        f"rtmp://x.rtmp.youtube.com/live2/{STREAM_KEY}"
-    ]
-
-    pipe = subprocess.Popen(command, stdin=subprocess.PIPE)
+    global subs
 
     while True:
 
-        frame = np.zeros((height,width,3),np.uint8)
+        subs = str(get_subscribers(CHANNEL_ID))
 
-        # neon purple background
-        frame[:] = (120,0,200)
+        text = f"LIVE SUBSCRIBER COUNT : {subs}"
 
-        title = "LIVE SUBSCRIBER COUNT"
-        subs_text = str(current_subs)
+        command = [
+            "ffmpeg",
+            "-re",
+            "-f","lavfi",
+            "-i","color=c=purple:s=1280x720:r=30",
+            "-f","lavfi",
+            "-i","anullsrc=channel_layout=stereo:sample_rate=44100",
+            "-vf",f"drawtext=text='{text}':fontcolor=white:fontsize=60:x=(w-text_w)/2:y=(h-text_h)/2",
+            "-c:v","libx264",
+            "-preset","veryfast",
+            "-pix_fmt","yuv420p",
+            "-b:v","2500k",
+            "-maxrate","2500k",
+            "-bufsize","5000k",
+            "-c:a","aac",
+            "-b:a","128k",
+            "-ar","44100",
+            "-f","flv",
+            f"rtmp://x.rtmp.youtube.com/live2/{STREAM_KEY}"
+        ]
 
-        cv2.putText(frame,title,(250,200),
-                    cv2.FONT_HERSHEY_SIMPLEX,1.5,(255,255,255),3)
-
-        cv2.putText(frame,subs_text,(500,400),
-                    cv2.FONT_HERSHEY_SIMPLEX,3,(255,255,255),6)
-
-        pipe.stdin.write(frame.tobytes())
-
-
-threading.Thread(target=update_subs).start()
-
-start_stream()
+        process = subprocess.Popen(command)
+        time.sleep(5)
+        process.kill()
